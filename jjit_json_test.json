@@ -1,0 +1,361 @@
+[
+  {
+    "title": "Senior Frontend Developer",
+    "street": "Aleksanterinkatu 30-34",
+    "city": "Helsinki",
+    "country_code": "FI",
+    "address_text": "Aleksanterinkatu 30-34, Helsinki",
+    "marker_icon": "php",
+    "workplace_type": "remote",
+    "company_name": "Nordhealth",
+    "company_url": "https://nordhealth.com/",
+    "company_size": "400",
+    "experience_level": "senior",
+    "latitude": "60.168939",
+    "longitude": "24.9501557",
+    "published_at": "2023-07-11T13:00:10.917Z",
+    "remote_interview": true,
+    "open_to_hire_ukrainians": false,
+    "id": "nordhealth-senior-frontend-developer-helsinki",
+    "display_offer": true,
+    "employment_types": [
+      {
+        "type": "b2b",
+        "salary": {
+          "from": 3500,
+          "to": 5500,
+          "currency": "eur"
+        }
+      },
+      {
+        "type": "permanent",
+        "salary": {
+          "from": 3500,
+          "to": 5500,
+          "currency": "eur"
+        }
+      }
+    ],
+    "company_logo_url": "https://bucket.justjoin.it/offers/company_logos/thumb/24bcb5254bec2e2fd351b228552b33be4bc69b4a.png?1686918793",
+    "skills": [
+      {
+        "name": "Nuxt",
+        "level": 3
+      },
+      {
+        "name": "Vue",
+        "level": 4
+      },
+      {
+        "name": "TypeScript",
+        "level": 4
+      }
+    ],
+    "remote": true,
+    "multilocation": [
+      {
+        "city": "Gdańsk",
+        "slug": "nordhealth-senior-frontend-developer-gdansk",
+        "street": "-"
+      },
+      {
+        "city": "Berlin",
+        "slug": "nordhealth-senior-frontend-developer-berlin",
+        "street": "-"
+      },
+      {
+        "city": "Poznań",
+        "slug": "nordhealth-senior-frontend-developer-poznan",
+        "street": "-"
+      },
+      {
+        "city": "Warszawa",
+        "slug": "nordhealth-senior-frontend-developer-warszawa",
+        "street": "-"
+      },
+      {
+        "city": "Praga",
+        "slug": "nordhealth-senior-frontend-developer-praga",
+        "street": "-"
+      },
+      {
+        "city": "Helsinki",
+        "slug": "nordhealth-senior-frontend-developer-helsinki",
+        "street": "Aleksanterinkatu 30-34"
+      },
+      {
+        "city": "Kraków",
+        "slug": "nordhealth-senior-frontend-developer-krakow",
+        "street": "-"
+      },
+      {
+        "city": "Madryt",
+        "slug": "nordhealth-senior-frontend-developer-madryt",
+        "street": "-"
+      },
+      {
+        "city": "Budapeszt",
+        "slug": "nordhealth-senior-frontend-developer-budapeszt",
+        "street": "-"
+      },
+      {
+        "city": "Wrocław",
+        "slug": "nordhealth-senior-frontend-developer-wroclaw",
+        "street": "-"
+      }
+    ],
+    "way_of_apply": "redirect"
+  },
+  {
+    "title": "IT Operations Specialist",
+    "street": "Jutrzenki 139",
+    "city": "Warszawa",
+    "country_code": "PL",
+    "address_text": "Jutrzenki 139, Warszawa",
+    "marker_icon": "admin",
+    "workplace_type": "partly_remote",
+    "company_name": "ITCARD S.A.",
+    "company_url": "https://itcard.pl/kariera/",
+    "company_size": "300+",
+    "experience_level": "mid",
+    "latitude": "52.2007993",
+    "longitude": "20.9367701",
+    "published_at": "2023-07-11T13:00:10.917Z",
+    "remote_interview": true,
+    "open_to_hire_ukrainians": false,
+    "id": "itcard-s-a-it-operations-specialist-warszawa",
+    "display_offer": true,
+    "employment_types": [
+      {
+        "type": "b2b",
+        "salary": null
+      },
+      {
+        "type": "permanent",
+        "salary": null
+      }
+    ],
+    "company_logo_url": "https://bucket.justjoin.it/offers/company_logos/thumb/5febec2b5f9222c7b2610184fab6e7b78058c13f.png?1666603872",
+    "skills": [
+      {
+        "name": "Oracle",
+        "level": 2
+      },
+      {
+        "name": "MsSQL",
+        "level": 3
+      },
+      {
+        "name": "SQL",
+        "level": 3
+      }
+    ],
+    "remote": false,
+    "multilocation": [
+      {
+        "city": "Warszawa",
+        "street": "Jutrzenki 139",
+        "slug": "itcard-s-a-it-operations-specialist-warszawa"
+      }
+    ],
+    "way_of_apply": "redirect"
+  },
+  {
+    "title": "PHP Developer",
+    "street": "Wirażowa 124 A",
+    "city": "Warszawa",
+    "country_code": "PL",
+    "address_text": "Wirażowa 124 A, Warszawa",
+    "marker_icon": "php",
+    "workplace_type": "remote",
+    "company_name": "GoWork.pl",
+    "company_url": "https://www.gowork.pl",
+    "company_size": "100+",
+    "experience_level": "mid",
+    "latitude": "52.179088",
+    "longitude": "20.9855959",
+    "published_at": "2023-07-12T06:00:11.944Z",
+    "remote_interview": true,
+    "open_to_hire_ukrainians": false,
+    "id": "gowork-pl-php-developer-ce53115e-66a0-4940-bb1d-8d3fa1be2be4",
+    "display_offer": true,
+    "employment_types": [
+      {
+        "type": "b2b",
+        "salary": {
+          "from": 12000,
+          "to": 18000,
+          "currency": "pln"
+        }
+      }
+    ],
+    "company_logo_url": "https://bucket.justjoin.it/offers/company_logos/thumb/2bec9e859d25623303e284883f2c5cd8b55a3975.jpg?1638950554",
+    "skills": [
+      {
+        "name": "PHPUnit",
+        "level": 4
+      },
+      {
+        "name": "PHP 7.x",
+        "level": 4
+      },
+      {
+        "name": "OOP",
+        "level": 4
+      }
+    ],
+    "remote": true,
+    "multilocation": [
+      {
+        "city": "Poznań",
+        "slug": "gowork-pl-php-developer-53afb796-b5a4-4e7a-aa28-4e7ddefa041d",
+        "street": "-"
+      },
+      {
+        "city": "Szczecin",
+        "slug": "gowork-pl-php-developer-655c7305-a02d-4a98-9e6a-431bd90d11d5",
+        "street": "-"
+      },
+      {
+        "city": "Rzeszów",
+        "slug": "gowork-pl-php-developer-6d11c61f-9bf3-445b-a4ee-df7d84d30a96",
+        "street": "-"
+      },
+      {
+        "city": "Kielce",
+        "slug": "gowork-pl-php-developer-1f716454-f04c-41dd-a807-bd9fcbb88bd6",
+        "street": "-"
+      },
+      {
+        "city": "Gdynia",
+        "slug": "gowork-pl-php-developer-ec661f53-d5fe-49bb-a178-0e6b6176df5f",
+        "street": "-"
+      },
+      {
+        "city": "Bydgoszcz",
+        "slug": "gowork-pl-php-developer-453ff60f-15c2-4f6a-9154-6801db75475f",
+        "street": "-"
+      },
+      {
+        "city": "Katowice",
+        "slug": "gowork-pl-php-developer-bd7d00d1-dc48-45e6-a4c2-96f952a8381a",
+        "street": "-"
+      },
+      {
+        "city": "Wrocław",
+        "slug": "gowork-pl-php-developer-3f86476e-eed8-4317-b160-5f2914f030b0",
+        "street": "-"
+      },
+      {
+        "city": "Lublin",
+        "slug": "gowork-pl-php-developer-3a03c26a-e0fe-48ca-9314-6b96e908899b",
+        "street": "-"
+      },
+      {
+        "city": "Warszawa",
+        "slug": "gowork-pl-php-developer-ce53115e-66a0-4940-bb1d-8d3fa1be2be4",
+        "street": "Wirażowa 124 A"
+      },
+      {
+        "city": "Gorzów Wielkopolski",
+        "slug": "gowork-pl-php-developer-4a7211da-eb82-4105-9301-bf865d7fa132",
+        "street": "-"
+      },
+      {
+        "city": "Olsztyn",
+        "slug": "gowork-pl-php-developer-7de8a66a-4e8c-404d-85ee-7e54de0606c2",
+        "street": "-"
+      },
+      {
+        "city": "Wrocław",
+        "slug": "gowork-pl-php-developer-d2789550-f2ac-43ac-9618-fc0943eec44f",
+        "street": "-"
+      },
+      {
+        "city": "Kraków",
+        "slug": "gowork-pl-php-developer-39072e87-f0d7-4163-9764-dd4bc8568c6e",
+        "street": "-"
+      },
+      {
+        "city": "Zielona Góra",
+        "slug": "gowork-pl-php-developer-8ab62114-9d2f-45ac-95a2-4cd396e4b627",
+        "street": "-"
+      },
+      {
+        "city": "Białystok",
+        "slug": "gowork-pl-php-developer-3ca25e9d-3346-4f7f-b15a-285ea1ff7b6b",
+        "street": "-"
+      },
+      {
+        "city": "Gdańsk",
+        "slug": "gowork-pl-php-developer-0692e70a-dfb7-4286-b534-3f2d49e0e84e",
+        "street": "-"
+      },
+      {
+        "city": "Opole",
+        "slug": "gowork-pl-php-developer-cfd602dc-a964-4d51-85a2-8f06cf19c6a1",
+        "street": "-"
+      },
+      {
+        "city": "Łódź",
+        "slug": "gowork-pl-php-developer-85ed9c93-07f7-43d9-8602-15f92602146d",
+        "street": "-"
+      }
+    ],
+    "way_of_apply": "form"
+  },
+  {
+    "title": "SAP Innovation \u0026 People Manager",
+    "street": "-",
+    "city": "Opole",
+    "country_code": "PL",
+    "address_text": "-, Opole",
+    "marker_icon": "erp",
+    "workplace_type": "partly_remote",
+    "company_name": "Convista",
+    "company_url": "http://convista.pl",
+    "company_size": "100+",
+    "experience_level": "senior",
+    "latitude": "50.6683223",
+    "longitude": "17.9230651",
+    "published_at": "2023-07-14T09:23:00.000Z",
+    "remote_interview": true,
+    "open_to_hire_ukrainians": false,
+    "id": "convista-sap-innovation-people-manager-opole",
+    "display_offer": false,
+    "employment_types": [
+      {
+        "type": "permanent",
+        "salary": {
+          "from": 19000,
+          "to": 30000,
+          "currency": "pln"
+        }
+      }
+    ],
+    "company_logo_url": "https://bucket.justjoin.it/offers/company_logos/thumb/868eba24fa57871623a8ffeac4bb3604c442c323.png?1685602627",
+    "skills": [
+      {
+        "name": "SAP Cloud Foundry",
+        "level": 3
+      },
+      {
+        "name": "SAP BTP",
+        "level": 3
+      },
+      {
+        "name": "ABAP OO",
+        "level": 4
+      }
+    ],
+    "remote": false,
+    "multilocation": [
+      {
+        "city": "Opole",
+        "street": "-",
+        "slug": "convista-sap-innovation-people-manager-opole"
+      }
+    ],
+    "way_of_apply": "redirect"
+  }
+]
