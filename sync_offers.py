@@ -41,7 +41,7 @@ class SyncOffers:
             SQL_insert = "INSERT INTO offers_info(jjit_id,title,company_name,marker_icon,workplace_type,experience_level,import_date, country_code) VALUES (%(jjit_id)s, %(title)s, %(company_name)s, %(marker_icon)s, %(workplace_type)s, %(experience_level)s, CURRENT_DATE, %(cc)s) RETURNING id;"
             offer_data = {'jjit_id': offer['id'], 'title': offer['title'], 'company_name': offer['company_name'],
                           'marker_icon': offer['marker_icon'], 'workplace_type': offer['workplace_type'],
-                          'experience_level': offer['experience_level'], 'cc': offer['country_code']}
+                          'experience_level': offer['experience_level'], 'import_date': DZISIEJSZA DATA, 'country_codec': offer['country_code']}
             try:
                 cursor.execute(SQL_insert, offer_data)
                 internal_order_id = cursor.fetchone()[0]
