@@ -33,12 +33,13 @@ class DBConnector:
         return existing_row
 
     def insert_one(self, tab_name, dict):
-        sql_insert = sql.SQL("INSERT INTO {tab_name} ({col_name}) VALUES ({values})" + 'RETURNING id;').format(
+
+        try:
+            sql_insert = sql.SQL("INSERT INTO {tab_name} ({col_name}) VALUES ({values})" + 'RETURNING id;').format(
             col_name=sql.SQL(', ').join(map(lambda col_name: sql.Identifier(col_name), list(dict.keys()))),
             tab_name=sql.Identifier(tab_name),
             values=sql.SQL(', ').join(map(lambda value: sql.Placeholder(value), list(dict.keys()))))
 
-        try:
             self.cursor.execute(sql_insert, dict)
             internal_id = self.cursor.fetchone()[0]
             self.conn.commit()
@@ -46,6 +47,13 @@ class DBConnector:
 
         except psycopg2.errors.UniqueViolation:
             self.conn.rollback()
+            return None
+
+    def truncate_table(self, tab_name):
+        sql_truncate = sql.SQL("TRUNCATE TABLE {tab_name}").format(tab_name=sql.Identifier(tab_name))
+
+        self.cursor.execute(sql_truncate)
+        self.conn.commit()
 
     def close_cursor(self):
 
