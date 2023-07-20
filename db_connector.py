@@ -1,7 +1,5 @@
 import psycopg2
 from psycopg2 import sql
-from datetime import date
-
 
 class DBConnector:
 
@@ -31,6 +29,7 @@ class DBConnector:
 
         self.cursor.execute(sql_query, list(dict.values()))
         existing_row = self.cursor.fetchone()
+
         return existing_row
 
     def insert_one(self, tab_name, dict):
@@ -41,14 +40,15 @@ class DBConnector:
 
         try:
             self.cursor.execute(sql_insert, dict)
-            #UWAGA! zmienna wykorzystywana w innym zapytaniu
-            internal_order_id = self.cursor.fetchone()[0]
+            internal_id = self.cursor.fetchone()[0]
             self.conn.commit()
+            return internal_id
+
         except psycopg2.errors.UniqueViolation:
             self.conn.rollback()
 
+    def close_cursor(self):
 
-test1 = DBConnector("127.0.0.1", "just_join_it_offers", "lisek")
-print(test1.insert_one('offers_info', {'jjit_id': 'cos_tam', 'title': 'cos_tam', 'company_name': 'cos_tam',
-                          'marker_icon': 'cos_tam', 'workplace_type': 'cos_tam',
-                          'experience_level': 'cos_tam', 'import_date': date.today(), 'country_code': 'cos_tam'}))
+        self.cursor.close()
+        self.conn.close()
+

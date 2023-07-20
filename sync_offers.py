@@ -1,12 +1,8 @@
 import requests
-import psycopg2
+from datetime import date
+from db_connector import DBConnector
 
-
-class SyncOffers:
-
-    host = "127.0.0.1"
-    dbname = "just_join_it_offers"
-    user = "lisek"
+class SyncOffers():
 
     def call(self):
 
@@ -31,93 +27,70 @@ class SyncOffers:
             return new_array
         '''
 
-        conn_string = "host={0} user={1} dbname={2}".format(self.host, self.user, self.dbname)
-        conn = psycopg2.connect(conn_string)
-        cursor = conn.cursor()
+        offers_info = DBConnector("127.0.0.1","just_join_it_offers","lisek")
+        offers_locations = DBConnector("127.0.0.1","just_join_it_offers","lisek")
+        offers_per_location_id = DBConnector("127.0.0.1","just_join_it_offers","lisek")
+        offers_skills = DBConnector("127.0.0.1","just_join_it_offers","lisek")
+        skills_per_offer = DBConnector("127.0.0.1","just_join_it_offers","lisek")
+        offers_empl_type =  DBConnector("127.0.0.1","just_join_it_offers","lisek")
+
 
         # MAIN tab
         for offer in duplicates_removed:
 
-            SQL_insert = "INSERT INTO offers_info(jjit_id,title,company_name,marker_icon,workplace_type,experience_level,import_date, country_code) VALUES (%(jjit_id)s, %(title)s, %(company_name)s, %(marker_icon)s, %(workplace_type)s, %(experience_level)s, CURRENT_DATE, %(cc)s) RETURNING id;"
-            offer_data = {'jjit_id': offer['id'], 'title': offer['title'], 'company_name': offer['company_name'],
+
+            internal_order_id = offers_info.insert_one('offers_info', {'jjit_id': offer['id'], 'title': offer['title'], 'company_name': offer['company_name'],
                           'marker_icon': offer['marker_icon'], 'workplace_type': offer['workplace_type'],
-                          'experience_level': offer['experience_level'], 'import_date': DZISIEJSZA DATA, 'country_codec': offer['country_code']}
-            try:
-                cursor.execute(SQL_insert, offer_data)
-                internal_order_id = cursor.fetchone()[0]
-                conn.commit()
-            except psycopg2.errors.UniqueViolation:
-                conn.rollback()
-                continue
+                          'experience_level': offer['experience_level'], 'import_date': date.today(), 'country_code': offer['country_code']})
+
+
 
             # LOCATION tab
 
             for city_name in offer['multilocation']:
-                sql_city_id = "SELECT id FROM offers_locations where city = %s;"
-                cursor.execute(sql_city_id, (city_name['city'],))
-                existing_city = cursor.fetchone()
+
+                existing_city = offers_locations.select_one('offers_locations',{'city':city_name['city']})
 
                 if not existing_city:
-                    SQL_insert_location = "INSERT INTO offers_locations(city) VALUES (%(city)s) RETURNING ID;"
-                    location_data = {'city': city_name['city']}
-                    cursor.execute(SQL_insert_location, location_data)
-                    existing_city_id = cursor.fetchone()[0]
-                    conn.commit()
+
+                    existing_city_id = offers_locations.insert_one('offers_locations',{'city':city_name['city']})
+
                 else:
                     existing_city_id = existing_city[0]
 
                 # table joining offer_id with location_id (joining offers_locations with offers_info tab on internal ids)
-                try:
-                    sql_insert_loc_id = "INSERT INTO offers_per_location_id(offer_id,location_id) VALUES (%(offer_id)s, %(loc_id)s);"
-                    offer_location_data = {'offer_id': internal_order_id, 'loc_id': existing_city_id}
-                    cursor.execute(sql_insert_loc_id, offer_location_data)
-                    conn.commit()
-                except psycopg2.errors.UniqueViolation:
-                    conn.rollback()
+
+                offers_per_location_id.insert_one('offers_per_location_id',{'offer_id':internal_order_id,'location_id':existing_city_id})
+
 
             # SKILLS tab
 
             for skill in offer['skills']:
-                sql_skill_id = "SELECT id FROM offers_skills where skill_name = %s;"
-                cursor.execute(sql_skill_id, (skill['name'],))
-                existing_skill = cursor.fetchone()
+
+                existing_skill = offers_skills.select_one('offers_skills',{'skill_name':skill['name']})
 
                 if not existing_skill:
-                    SQL_insert_skill = "INSERT INTO offers_skills(skill_name) VALUES (%(name)s) RETURNING ID;"
-                    skills_data = {'name': skill['name']}
-                    cursor.execute(SQL_insert_skill, skills_data)
-                    existing_skill_id = cursor.fetchone()[0]
-                    conn.commit()
+
+                    existing_skill_id = offers_skills.insert_one('offers_skills',{'skill_name':skill['name']})
+
                 else:
                     existing_skill_id = existing_skill[0]
 
                 # table joining offer_id with skill_id
-                try:
-                    sql_insert_skill_id = "INSERT INTO skills_per_offer(offer_id,skill_id) VALUES (%(offer_id)s, %(skill_id)s);"
-                    offer_skill_data = {'offer_id': internal_order_id, 'skill_id': existing_skill_id}
-                    cursor.execute(sql_insert_skill_id, offer_skill_data)
-                    conn.commit()
-                except psycopg2.errors.UniqueViolation:
-                    conn.rollback()
+
+                skills_per_offer.insert_one('skills_per_offer',{'offer_id':internal_order_id, 'skill_id':existing_skill_id})
 
             # EMPLOYMENT INFO tab
 
             for empl_info in offer['employment_types']:
 
-                SQL_empl_info_insert = "INSERT INTO offers_empl_type(offer_id,empl_type,salary_from,salary_to,currency) VALUES (%(offer_id)s, %(type)s, %(sal_fr)s, %(sal_to)s, %(curr)s);"
-                if empl_info['salary'] == None:
-                    salary_data = {'offer_id': internal_order_id, 'type': empl_info['type'], 'sal_fr': 0, 'sal_to': 0,
-                                   'curr': ""}
+                if empl_info['salary']:
+
+                    offers_empl_type.insert_one('offers_empl_type', {'offer_id': internal_order_id, 'empl_type': empl_info['type'], 'salary_from': empl_info['salary']['from'], 'salary_to': empl_info['salary']['to'], 'currency': empl_info['salary']['currency']})
+
                 else:
-                    salary_data = {'offer_id': internal_order_id, 'type': empl_info['type'],
-                                   'sal_fr': empl_info['salary']['from'], 'sal_to': empl_info['salary']['to'],
-                                   'curr': empl_info['salary']['currency']}
+                    offers_empl_type.insert_one('offers_empl_type',{'offer_id': internal_order_id, 'empl_type': empl_info['type'],'salary_from': 0, 'salary_to': 0, 'currency': ""})
 
-                try:
-                    cursor.execute(SQL_empl_info_insert, salary_data)
-                    conn.commit()
-                except psycopg2.errors.UniqueViolation:
-                    conn.rollback()
 
-        cursor.close()
-        conn.close()
+        DBConnector("127.0.0.1","just_join_it_offers","lisek").close_cursor()
+
