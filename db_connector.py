@@ -50,7 +50,7 @@ class DBConnector:
             return None
 
     def truncate_table(self, tab_name):
-        sql_truncate = sql.SQL("TRUNCATE TABLE {tab_name}").format(tab_name=sql.Identifier(tab_name))
+        sql_truncate = sql.SQL("TRUNCATE TABLE {tab_name}").format(tab_name=sql.SQL(', ').join(map(lambda tab_name: sql.Identifier(tab_name), tab_name)))
 
         self.cursor.execute(sql_truncate)
         self.conn.commit()

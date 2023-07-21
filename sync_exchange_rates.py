@@ -5,6 +5,10 @@ from db_connector import DBConnector
 
 class SyncExchangeRates:
 
+    host = "127.0.0.1"
+    dbname = "just_join_it_offers"
+    user = "lisek"
+
     def call(self):
         api_request = requests.get('http://api.nbp.pl/api/exchangerates/tables/a/?format=json')
 
@@ -13,8 +17,8 @@ class SyncExchangeRates:
 
         rates_data = api_request.json()[0]['rates']
 
-        exchange_rates = DBConnector("127.0.0.1","just_join_it_offers","lisek")
-        exchange_rates.truncate_table('exchange_rates')
+        exchange_rates = DBConnector(self.host, self.dbname, self.user)
+        exchange_rates.truncate_table(['exchange_rates'])
 
         for elem in rates_data:
 

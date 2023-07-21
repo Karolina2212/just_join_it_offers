@@ -3,6 +3,9 @@ from datetime import date
 from db_connector import DBConnector
 
 class SyncOffers():
+    host = "127.0.0.1"
+    dbname = "just_join_it_offers"
+    user = "lisek"
 
     def call(self):
 
@@ -27,7 +30,7 @@ class SyncOffers():
             return new_array
         '''
 
-        offers_sync = DBConnector("127.0.0.1","just_join_it_offers","lisek")
+        offers_sync = DBConnector(self.host, self.dbname, self.user)
 
         # MAIN tab
         for offer in duplicates_removed:

@@ -70,6 +70,7 @@ class TestSyncOffers(unittest.TestCase):
             self.cursor.execute(sql_select)
             data_check_select = self.cursor.fetchall()
 
+
             self.assertEqual(data_check_select[0][4:], ('nordhealth-senior-frontend-developer-helsinki', 'Senior Frontend Developer', 'Nordhealth', 'php','remote', 'senior', 'FI'))
 
             data_check=list(map(lambda empl_type: empl_type[:4],data_check_select))
