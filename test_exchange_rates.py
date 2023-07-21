@@ -1,5 +1,10 @@
 import unittest
 from unittest.mock import patch
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+load_dotenv(".env.test", override=True)
+
 from sync_exchange_rates import SyncExchangeRates
 import json
 import psycopg2
@@ -11,7 +16,6 @@ class TestSyncExchangeRates(unittest.TestCase):
 
     def setUp(self):
         self.sync_exchange_rates = SyncExchangeRates()
-        self.sync_exchange_rates.dbname = 'just_join_it_offers_test'
         conn_string = "host={0} user={1} dbname={2}".format(self.sync_exchange_rates.host, self.sync_exchange_rates.user, self.sync_exchange_rates.dbname)
         self.conn = psycopg2.connect(conn_string)
         self.cursor = self.conn.cursor()

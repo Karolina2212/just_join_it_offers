@@ -1,3 +1,5 @@
 backups/
 .idea/
 __pycache__/
+.env
+.env.test

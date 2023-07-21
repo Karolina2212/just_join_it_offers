@@ -1,4 +1,9 @@
 import unittest
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+load_dotenv(".env.test", override=True)
+
 from sync_offers import SyncOffers
 from unittest.mock import patch
 import json
@@ -9,7 +14,6 @@ class TestSyncOffers(unittest.TestCase):
 
     def setUp(self):
         self.sync_offers = SyncOffers()
-        self.sync_offers.dbname = 'just_join_it_offers_test'
         conn_string = "host={0} user={1} dbname={2}".format(self.sync_offers.host, self.sync_offers.user, self.sync_offers.dbname)
         self.conn = psycopg2.connect(conn_string)
         self.cursor = self.conn.cursor()

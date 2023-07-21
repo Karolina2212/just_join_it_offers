@@ -1,4 +1,10 @@
 import unittest
+import os
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+load_dotenv(".env.test", override=True)
+
 from db_connector import DBConnector
 import psycopg2
 from psycopg2 import sql
@@ -7,9 +13,8 @@ from datetime import date
 class TestDBConnector(unittest.TestCase):
 
     def setUp(self):
-        self.db_connector = DBConnector('127.0.0.1','just_join_it_offers_test','lisek')
-
-        conn_string = "host={0} user={1} dbname={2}".format('127.0.0.1','lisek', 'just_join_it_offers_test')
+        self.db_connector = DBConnector(os.getenv("HOST"),os.getenv("DB_NAME"),os.getenv("USER"))
+        conn_string = "host={0} user={1} dbname={2}".format(os.getenv("HOST"),os.getenv("USER"),os.getenv("DB_NAME"))
         self.conn = psycopg2.connect(conn_string)
         self.cursor = self.conn.cursor()
 

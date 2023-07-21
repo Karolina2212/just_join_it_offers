@@ -1,13 +1,15 @@
 import requests
 from datetime import date
 from db_connector import DBConnector
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 class SyncExchangeRates:
-
-    host = "127.0.0.1"
-    dbname = "just_join_it_offers"
-    user = "lisek"
+    host = os.getenv("HOST")
+    dbname = os.getenv("DB_NAME")
+    user = os.getenv("USER")
 
     def call(self):
         api_request = requests.get('http://api.nbp.pl/api/exchangerates/tables/a/?format=json')
