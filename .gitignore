@@ -3,3 +3,4 @@ backups/
 __pycache__/
 .env
 .env.test
+export_from_database_to_excel.py

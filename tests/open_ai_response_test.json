@@ -1,0 +1,9 @@
+{
+  "choices": [
+    {
+      "message": {
+        "content": "{\"Warszawa\": \"Poland\",\n  \"Belgrad\": \"Serbia\",\n  \"Kyiv\": \"Ukraine\"}"
+      }
+    }
+  ]
+}

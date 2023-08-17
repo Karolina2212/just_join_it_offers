@@ -6,6 +6,6 @@ SyncOffers().call()
 SyncExchangeRates().call()
 
 # OPENAI API KEY required
-#AddCountry().find_country_for_city()
+AddCountry().find_country_for_city()
 
 print("Done")
