@@ -1,14 +1,10 @@
 import unittest
 from unittest.mock import patch
-from dotenv import load_dotenv
-
-load_dotenv(".env")
-load_dotenv(".env.test", override=True)
-
-from sync_exchange_rates import SyncExchangeRates
-import json
+from lib.sync_exchange_rates import SyncExchangeRates
+from lib.settings import Settings
 import psycopg2
 from psycopg2 import sql
+import json
 from decimal import Decimal
 
 
@@ -16,7 +12,8 @@ class TestSyncExchangeRates(unittest.TestCase):
 
     def setUp(self):
         self.sync_exchange_rates = SyncExchangeRates()
-        conn_string = "host={0} user={1} dbname={2}".format(self.sync_exchange_rates.host, self.sync_exchange_rates.user, self.sync_exchange_rates.dbname)
+        settings = Settings()
+        conn_string = "host={0} user={1} dbname={2}".format(settings.host, settings.user, settings.dbname)
         self.conn = psycopg2.connect(conn_string)
         self.cursor = self.conn.cursor()
 
@@ -26,9 +23,9 @@ class TestSyncExchangeRates(unittest.TestCase):
 
     def test_exchange_rates(self):
 
-        with patch('sync_exchange_rates.requests.get') as mocked_get:
+        with patch('lib.sync_exchange_rates.requests.get') as mocked_get:
             mocked_get.return_value.status_code = 200
-            test_file = open('exch_rates_test.json')
+            test_file = open('./tests/exch_rates_test.json')
             mocked_get.return_value.json = unittest.mock.Mock(return_value=json.load(test_file))
             test_file.close()
 

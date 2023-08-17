@@ -1,20 +1,17 @@
 import unittest
-from dotenv import load_dotenv
-
-load_dotenv(".env")
-load_dotenv(".env.test", override=True)
-
-from sync_offers import SyncOffers
 from unittest.mock import patch
-import json
+from lib.sync_offers import SyncOffers
+from lib.settings import Settings
 import psycopg2
 from psycopg2 import sql
+import json
 
 class TestSyncOffers(unittest.TestCase):
 
     def setUp(self):
         self.sync_offers = SyncOffers()
-        conn_string = "host={0} user={1} dbname={2}".format(self.sync_offers.host, self.sync_offers.user, self.sync_offers.dbname)
+        settings = Settings()
+        conn_string = "host={0} user={1} dbname={2}".format(settings.host, settings.user, settings.dbname)
         self.conn = psycopg2.connect(conn_string)
         self.cursor = self.conn.cursor()
 
@@ -27,9 +24,9 @@ class TestSyncOffers(unittest.TestCase):
         self.conn.close()
 
     def test_offers_info(self):
-        with patch('sync_offers.requests.get') as mocked_get:
+        with patch('lib.sync_offers.requests.get') as mocked_get:
             mocked_get.return_value.status_code = 200
-            test_file = open('jjit_json_test.json')
+            test_file = open('./tests/jjit_json_test.json')
             mocked_get.return_value.json = unittest.mock.Mock(return_value=json.load(test_file))
             test_file.close()
 
@@ -49,9 +46,9 @@ class TestSyncOffers(unittest.TestCase):
 
     def test_offers_empl_type(self):
 
-        with patch('sync_offers.requests.get') as mocked_get:
+        with patch('lib.sync_offers.requests.get') as mocked_get:
             mocked_get.return_value.status_code = 200
-            test_file = open('jjit_json_test.json')
+            test_file = open('./tests/jjit_json_test.json')
             mocked_get.return_value.json = unittest.mock.Mock(return_value=json.load(test_file))
             test_file.close()
 
@@ -84,9 +81,9 @@ class TestSyncOffers(unittest.TestCase):
 
     def test_offers_skills(self):
 
-        with patch('sync_offers.requests.get') as mocked_get:
+        with patch('lib.sync_offers.requests.get') as mocked_get:
             mocked_get.return_value.status_code = 200
-            test_file = open('jjit_json_test.json')
+            test_file = open('./tests/jjit_json_test.json')
             mocked_get.return_value.json = unittest.mock.Mock(return_value=json.load(test_file))
             test_file.close()
 
@@ -102,7 +99,7 @@ class TestSyncOffers(unittest.TestCase):
             self.assertEqual(len(data_check),9)
 
             #check of skills list completness
-            self.assertEqual(data_check,['MsSQL', 'Nuxt', 'OOP', 'Oracle', 'PHP 7.x', 'PHPUnit', 'SQL', 'TypeScript', 'Vue'])
+            self.assertEqual(data_check,['Mssql', 'Nuxt', 'Oop', 'Oracle', 'Php 7.X', 'Phpunit', 'Sql', 'Typescript', 'Vue'])
 
             #check of data accuracy for join offers with skills (example check for 1 offer)
             sql_select = sql.SQL("select os.skill_name , oi.jjit_id, oi.title, oi.company_name, oi.marker_icon, oi.workplace_type, oi.experience_level, oi.country_code  from offers_info oi join skills_per_offer spo on oi.id = spo.offer_id join offers_skills os on spo.skill_id = os.id WHERE {pkey} = 'gowork-pl-php-developer-ce53115e-66a0-4940-bb1d-8d3fa1be2be4'").format(pkey=sql.Identifier('jjit_id'))
@@ -113,13 +110,13 @@ class TestSyncOffers(unittest.TestCase):
             skill_check = list(map(lambda record: record[0],data_check))
             skill_check.sort()
 
-            self.assertEqual(skill_check,['OOP', 'PHP 7.x', 'PHPUnit'])
+            self.assertEqual(skill_check,['Oop', 'Php 7.X', 'Phpunit'])
 
     def test_offers_locations(self):
 
-        with patch('sync_offers.requests.get') as mocked_get:
+        with patch('lib.sync_offers.requests.get') as mocked_get:
             mocked_get.return_value.status_code = 200
-            test_file = open('jjit_json_test.json')
+            test_file = open('./tests/jjit_json_test.json')
             mocked_get.return_value.json = unittest.mock.Mock(return_value=json.load(test_file))
             test_file.close()
 
