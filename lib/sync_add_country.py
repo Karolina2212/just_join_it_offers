@@ -27,8 +27,6 @@ class AddCountry:
 
         city_country_dict = json.loads(json_returned)
 
-        print(city_country_dict[:2])
-
         for city,country in city_country_dict.items():
             city_str = str(city)
             country_str = str(country)

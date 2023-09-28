@@ -17,10 +17,10 @@ CREATE TABLE offers_info (
 	workplace_type text NULL,
 	experience_level text NULL,
 	import_date date NULL,
-	country_code text NULL,
 	CONSTRAINT duplicate_not_allowed UNIQUE (jjit_id, import_date),
 	CONSTRAINT offers_info_pkey PRIMARY KEY (id)
 );
+
 
 CREATE TABLE offers_locations (
 	id serial4 NOT NULL,
@@ -34,7 +34,6 @@ CREATE TABLE offers_locations (
 CREATE TABLE offers_skills (
 	id serial4 NOT NULL,
 	skill_name text NULL,
-	skill_group text NULL,
 	CONSTRAINT offers_skills_pkey PRIMARY KEY (id),
 	CONSTRAINT offers_skills_un UNIQUE (skill_name)
 );
@@ -62,6 +61,7 @@ CREATE TABLE offers_per_location_id (
 	CONSTRAINT offers_per_location_id_fk FOREIGN KEY (location_id) REFERENCES offers_locations(id),
 	CONSTRAINT offers_per_location_id_offer FOREIGN KEY (offer_id) REFERENCES offers_info(id)
 );
+
 
 CREATE TABLE skills_per_offer (
 	id serial4 NOT NULL,

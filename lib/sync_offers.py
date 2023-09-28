@@ -1,4 +1,5 @@
 import requests
+import json
 from datetime import date
 from lib.db_connector import DBConnector
 
@@ -10,37 +11,59 @@ class SyncOffers():
     def call(self):
         data = self.__fetch_justjoin_data()
 
-        duplicates_removed = list(filter(lambda offer: offer['display_offer'], data))
+        for offer in data:
 
-        for offer in duplicates_removed:
+            marker_icon = self.__get_category_label(offer['categoryId'])
 
-            internal_order_id = self.__insert_offers(offer)
+            internal_order_id = self.__insert_offers(offer,marker_icon)
             if not internal_order_id:
                 continue
 
             self.__insert_location(offer, internal_order_id)
-            self.__insert_skills(offer, internal_order_id)
+            self.__insert_skills(offer,internal_order_id)
             self.__insert_employment_info(offer, internal_order_id)
 
         self.db_connector.close_cursor()
 
     def __fetch_justjoin_data(self):
-        api_request = requests.get('https://justjoin.it/api/offers')
 
-        if api_request.status_code != 200:
-            raise Exception(f"Request failed with status: {api_request.status_code}")
+        page_num = 1
+        data = []
 
-        return api_request.json()
+        while page_num:
+            url = 'https://api.justjoin.it/v2/user-panel/offers?&page=' + str(page_num) + '&sortBy=published&orderBy=DESC&perPage=100&salaryCurrencies=PLN'
+            headers = {'Version': '2'}
+            api_request = requests.get(url, headers=headers)
 
-    def __insert_offers(self, offer):
+            if api_request.status_code != 200:
+                raise Exception(f"Request failed with status: {api_request.status_code}")
+
+            api_page_data = api_request.json()
+            for offer_on_page in api_page_data['data']:
+                data.append(offer_on_page)
+
+            page_num = api_page_data['meta']['nextPage']
+
+        return data
+
+    def __get_category_label(self,category_id):
+
+        category_file = open('./lib/jjit_marker_icons.json')
+        marker_icons_data = json.load(category_file)
+        category_file.close()
+        for category in marker_icons_data['categories']:
+            if category['value'] == category_id:
+                return category['slug']
+
+    def __insert_offers(self, offer, marker_icon):
         internal_order_id = self.db_connector.insert_one('offers_info',
-                                                         {'jjit_id': offer['id'], 'title': offer['title'],
-                                                          'company_name': offer['company_name'],
-                                                          'marker_icon': offer['marker_icon'],
-                                                          'workplace_type': offer['workplace_type'],
-                                                          'experience_level': offer['experience_level'],
-                                                          'import_date': date.today(),
-                                                          'country_code': offer['country_code']
+                                                         {'jjit_id': offer['slug'],
+                                                          'title': offer['title'],
+                                                          'company_name': offer['companyName'],
+                                                          'marker_icon': marker_icon,
+                                                          'workplace_type': offer['workplaceType'],
+                                                          'experience_level': offer['experienceLevel'],
+                                                          'import_date': date.today()
                                                           })
 
         return internal_order_id
@@ -61,8 +84,9 @@ class SyncOffers():
             })
 
     def __insert_skills(self, offer, internal_order_id):
-        for skill in offer['skills']:
-            skill_name = skill['name'].title()
+
+        for skill in offer['requiredSkills']:
+            skill_name = skill.title()
             existing_skill = self.db_connector.select_one('offers_skills', {'skill_name': skill_name})
 
             if not existing_skill:
@@ -76,14 +100,14 @@ class SyncOffers():
             })
 
     def __insert_employment_info(self, offer, internal_order_id):
-        for empl_info in offer['employment_types']:
-            if empl_info['salary']:
+        for empl_info in offer['employmentTypes']:
+            if empl_info['from']:
                 self.db_connector.insert_one('offers_empl_type',{
                     'offer_id': internal_order_id,
                     'empl_type': empl_info['type'],
-                    'salary_from': empl_info['salary']['from'],
-                    'salary_to': empl_info['salary']['to'],
-                    'currency': empl_info['salary']['currency']
+                    'salary_from': empl_info['from'],
+                    'salary_to': empl_info['to'],
+                    'currency': empl_info['currency']
                 })
             else:
                 self.db_connector.insert_one('offers_empl_type',{
