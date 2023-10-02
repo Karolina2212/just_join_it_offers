@@ -5,6 +5,7 @@ from lib.settings import Settings
 import psycopg2
 import json
 
+
 class TestSyncAddCountry(unittest.TestCase):
 
     def setUp(self):
@@ -31,22 +32,21 @@ class TestSyncAddCountry(unittest.TestCase):
         self.conn.close()
 
     def test_country_added(self):
-
         with patch('lib.sync_add_country.openai.ChatCompletion.create') as mocked_create:
-            test_file = open('./tests/open_ai_response_test.json')
+            test_file = open('./tests/mocks/open_ai_response_test.json')
             mocked_create.return_value = json.load(test_file)
             test_file.close()
 
-        self.add_country.find_country_for_city()
+            self.add_country.call()
 
-        sql_select = "SELECT city, country FROM offers_locations"
-        self.cursor.execute(sql_select)
-        data_check = self.cursor.fetchall()
+            sql_select = "SELECT city, country FROM offers_locations"
+            self.cursor.execute(sql_select)
+            data_check = self.cursor.fetchall()
 
-        check_list = [('Warszawa','Poland'),('Belgrad','Serbia'),('Kyiv','Ukraine')]
+            check_list = [('Warszawa', 'Poland'), ('Belgrad', 'Serbia'), ('Kyiv', 'Ukraine')]
 
-        self.assertEqual(data_check, check_list)
+            self.assertEqual(data_check, check_list)
+
 
 if __name__ == '__main__':
     unittest.main()
-

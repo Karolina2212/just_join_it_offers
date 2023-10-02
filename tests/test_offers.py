@@ -1,14 +1,13 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, call
 from lib.sync_offers import SyncOffers
 from lib.settings import Settings
 import psycopg2
 from psycopg2 import sql
 import json
 
+
 class TestSyncOffers(unittest.TestCase):
-
-
 
     def setUp(self):
         self.sync_offers = SyncOffers()
@@ -17,158 +16,150 @@ class TestSyncOffers(unittest.TestCase):
         self.conn = psycopg2.connect(conn_string)
         self.cursor = self.conn.cursor()
 
-        self.cursor.execute('truncate table offers_empl_type, offers_info ,offers_locations, offers_per_location_id , offers_skills, skills_per_offer ')
+        self.cursor.execute('TRUNCATE TABLE offers_empl_type, offers_info ,offers_locations, offers_per_location_id , offers_skills, skills_per_offer ')
         self.conn.commit()
 
+        self.patcher = patch('lib.sync_offers.requests.get')
+        test_file = open('./tests/mocks/jjit_page1_test.json')
+        test_file2 = open('./tests/mocks/jjit_page2_test.json')
+        self.mock = self.patcher.start()
+        self.mock.side_effect = [
+            unittest.mock.Mock(**{'json.return_value': json.load(test_file), 'status_code': 200}),
+            unittest.mock.Mock(**{'json.return_value': json.load(test_file2), 'status_code': 200})]
+        test_file.close()
+        test_file2.close()
 
     def tearDown(self):
         self.cursor.close()
         self.conn.close()
+        self.patcher.stop()
 
     def test_offers_info(self):
-        with patch('lib.sync_offers.requests.get') as mocked_get:
-            mocked_get.return_value.status_code = 200
-            test_file = open('./tests/jjit_page1_test.json')
-            test_file2 = open('./tests/jjit_page2_test.json')
-            mocked_get.side_effect = [
-                unittest.mock.Mock(**{'json.return_value': json.load(test_file), 'status_code': 200}),
-                unittest.mock.Mock(**{'json.return_value': json.load(test_file2), 'status_code': 200})]
-            test_file.close()
-            test_file2.close()
+        self.sync_offers.call()
 
-            self.sync_offers.call()
+        sql_select_offers = sql.SQL("SELECT jjit_id, title, company_name, marker_icon, workplace_type, experience_level FROM {table}").format(
+            table=sql.Identifier('offers_info'))
+        self.cursor.execute(sql_select_offers)
+        data_check = self.cursor.fetchall()
+        data_check.sort()
 
-            sql_select_offers = sql.SQL("SELECT jjit_id, title, company_name, marker_icon, workplace_type, experience_level FROM {table}").format(table=sql.Identifier('offers_info'))
-            self.cursor.execute(sql_select_offers)
-            data_check = self.cursor.fetchall()
-            data_check.sort()
+        # check of total num of records
+        self.assertEqual(len(data_check), 3)
 
-            #check of total num of records
-            self.assertEqual(len(data_check),3)
-
-            # check of data accuracy in records
-            check_list = [('business-reporting-advisory-group-javascript-developer-wroclaw','JavaScript Developer','BR-AG P.S.A','javascript', 'remote', 'mid'),
-                          ('netguru-senior-mendix-low-code-developer-warszawa', 'Senior Mendix Low-code Developer', 'Netguru', 'other', 'partly_remote', 'senior'),
-                          ('roxart-agency-dowozacy-taski-prestashop-developer-rzeszow', 'Mid/Sr Prestashop Developer', 'ROXART Agency', 'php', 'remote', 'senior')]
-            check_list.sort()
-            self.assertEqual(data_check,check_list)
+        # check of data accuracy in records
+        check_list = [
+            ('business-reporting-advisory-group-javascript-developer-wroclaw', 'JavaScript Developer', 'BR-AG P.S.A', 'javascript', 'remote', 'mid'),
+            ('netguru-senior-mendix-low-code-developer-warszawa', 'Senior Mendix Low-code Developer', 'Netguru', 'other', 'partly_remote', 'senior'),
+            ('roxart-agency-dowozacy-taski-prestashop-developer-rzeszow', 'Mid/Sr Prestashop Developer', 'ROXART Agency', 'php', 'remote', 'senior')
+            ]
+        check_list.sort()
+        self.assertEqual(data_check, check_list)
 
     def test_offers_empl_type(self):
+        self.sync_offers.call()
 
-        with patch('lib.sync_offers.requests.get') as mocked_get:
-            mocked_get.return_value.status_code = 200
-            test_file = open('./tests/jjit_page1_test.json')
-            test_file2 = open('./tests/jjit_page2_test.json')
-            mocked_get.side_effect = [
-                unittest.mock.Mock(**{'json.return_value': json.load(test_file), 'status_code': 200}),
-                unittest.mock.Mock(**{'json.return_value': json.load(test_file2), 'status_code': 200})]
-            test_file.close()
-            test_file2.close()
+        sql_select = sql.SQL("SELECT empl_type,salary_from,salary_to,currency FROM {table}").format(
+            table=sql.Identifier('offers_empl_type'))
+        self.cursor.execute(sql_select)
+        data_check = self.cursor.fetchall()
+        data_check.sort()
 
-            self.sync_offers.call()
+        # check of total num of records
+        self.assertEqual(len(data_check), 5)
 
-            sql_select = sql.SQL("SELECT empl_type,salary_from,salary_to,currency FROM {table}").format(table=sql.Identifier('offers_empl_type'))
-            self.cursor.execute(sql_select)
-            data_check = self.cursor.fetchall()
-            data_check.sort()
+        # check of employment type list completness
+        check_list = [
+            ('permanent', 12000.00, 16000.00, 'pln'), ('b2b', 15000.00, 20000.00, 'pln'),
+            ('b2b', 5700.00, 8060.00, 'eur'), ('b2b', 0.0, 0.0, ''), ('permanent', 0.00, 0.00, '')
+            ]
+        check_list.sort()
+        self.assertEqual(data_check, check_list)
 
-            #check of total num of records
-            self.assertEqual(len(data_check),5)
+        # check of data accuracy for join offers with empl type (example check for 1 offer)
+        sql_select = sql.SQL("SELECT oet.empl_type , oet.salary_from, oet.salary_to, oet.currency, oi.jjit_id, oi.title, oi.company_name, oi.marker_icon, oi.workplace_type, oi.experience_level FROM offers_info oi JOIN offers_empl_type oet ON oi.id = oet.offer_id  WHERE {pkey} = 'business-reporting-advisory-group-javascript-developer-wroclaw'").format(
+            pkey=sql.Identifier('jjit_id'))
+        self.cursor.execute(sql_select)
+        data_check_select = self.cursor.fetchall()
 
-            #check of employment type list completness
-            check_list = [('permanent', 12000.00, 16000.00, 'pln'), ('b2b', 15000.00, 20000.00, 'pln'), ('b2b', 5700.00, 8060.00, 'eur'), ('b2b', 0.0, 0.0, ''), ('permanent', 0.00, 0.00, '')]
-            check_list.sort()
-            self.assertEqual(data_check,check_list)
+        self.assertEqual(data_check_select[0][4:], ('business-reporting-advisory-group-javascript-developer-wroclaw', 'JavaScript Developer', 'BR-AG P.S.A','javascript', 'remote', 'mid'))
 
-            # check of data accuracy for join offers with empl type (example check for 1 offer)
-            sql_select = sql.SQL( "select oet.empl_type , oet.salary_from, oet.salary_to, oet.currency, oi.jjit_id, oi.title, oi.company_name, oi.marker_icon, oi.workplace_type, oi.experience_level from offers_info oi join offers_empl_type oet on oi.id = oet.offer_id  WHERE {pkey} = 'business-reporting-advisory-group-javascript-developer-wroclaw'").format(pkey=sql.Identifier('jjit_id'))
-            self.cursor.execute(sql_select)
-            data_check_select = self.cursor.fetchall()
+        data_check = list(map(lambda empl_type: empl_type[:4], data_check_select))
+        data_check.sort()
 
-            self.assertEqual(data_check_select[0][4:], ('business-reporting-advisory-group-javascript-developer-wroclaw', 'JavaScript Developer', 'BR-AG P.S.A', 'javascript', 'remote', 'mid'))
-
-            data_check=list(map(lambda empl_type: empl_type[:4],data_check_select))
-            data_check.sort()
-
-            self.assertEqual(data_check,[('b2b', 15000.00, 20000.00, 'pln'), ('permanent', 12000.00, 16000.00, 'pln')])
+        self.assertEqual(data_check, [('b2b', 15000.00, 20000.00, 'pln'), ('permanent', 12000.00, 16000.00, 'pln')])
 
     def test_offers_skills(self):
+        self.sync_offers.call()
 
-        with patch('lib.sync_offers.requests.get') as mocked_get:
-            mocked_get.return_value.status_code = 200
-            test_file = open('./tests/jjit_page1_test.json')
-            test_file2 = open('./tests/jjit_page2_test.json')
-            mocked_get.side_effect = [
-                unittest.mock.Mock(**{'json.return_value': json.load(test_file), 'status_code': 200}),
-                unittest.mock.Mock(**{'json.return_value': json.load(test_file2), 'status_code': 200})]
-            test_file.close()
-            test_file2.close()
+        sql_select = sql.SQL("SELECT skill_name FROM {table}").format(table=sql.Identifier('offers_skills'))
+        self.cursor.execute(sql_select)
+        data_check_select = self.cursor.fetchall()
+        data_check = list(map(lambda skill: skill[0], data_check_select))
+        data_check.sort()
 
-            self.sync_offers.call()
+        # check of total num of records
+        self.assertEqual(len(data_check), 15)
 
-            sql_select = sql.SQL("SELECT skill_name FROM {table}").format(table=sql.Identifier('offers_skills'))
-            self.cursor.execute(sql_select)
-            data_check_select = self.cursor.fetchall()
-            data_check = list(map(lambda skill: skill[0],data_check_select))
-            data_check.sort()
+        # check of skills list completness
+        check_list = ['Cypress', 'Node.Js', 'Agile', 'English', 'Angular', 'Javascript', 'Css3', 'Html', 'Java', 'Mendix', 'Css', 'Mysql', 'Php', 'Prestashop', 'Wordpress']
+        check_list.sort()
+        self.assertEqual(data_check, check_list)
 
-            #check of total num of records
-            self.assertEqual(len(data_check),15)
+        # check of data accuracy for join offers with skills (example check for 1 offer)
+        sql_select = sql.SQL(
+            "SELECT os.skill_name , oi.jjit_id, oi.title, oi.company_name, oi.marker_icon, oi.workplace_type, oi.experience_level FROM offers_info oi JOIN skills_per_offer spo ON oi.id = spo.offer_id JOIN offers_skills os ON spo.skill_id = os.id WHERE {pkey} = 'netguru-senior-mendix-low-code-developer-warszawa'").format(
+            pkey=sql.Identifier('jjit_id'))
+        self.cursor.execute(sql_select)
+        data_check = self.cursor.fetchall()
 
-            #check of skills list completness
-            check_list = ['Cypress', 'Node.Js', 'Agile', 'English', 'Angular', 'Javascript', 'Css3', 'Html', 'Java', 'Mendix', 'Css', 'Mysql','Php', 'Prestashop', 'Wordpress']
-            check_list.sort()
-            self.assertEqual(data_check, check_list)
+        self.assertEqual(data_check[0][1:], ('netguru-senior-mendix-low-code-developer-warszawa', 'Senior Mendix Low-code Developer', 'Netguru', 'other', 'partly_remote', 'senior'))
+        skill_check = list(map(lambda record: record[0], data_check))
+        skill_check.sort()
 
-            #check of data accuracy for join offers with skills (example check for 1 offer)
-            sql_select = sql.SQL("select os.skill_name , oi.jjit_id, oi.title, oi.company_name, oi.marker_icon, oi.workplace_type, oi.experience_level from offers_info oi join skills_per_offer spo on oi.id = spo.offer_id join offers_skills os on spo.skill_id = os.id WHERE {pkey} = 'netguru-senior-mendix-low-code-developer-warszawa'").format(pkey=sql.Identifier('jjit_id'))
-            self.cursor.execute(sql_select)
-            data_check = self.cursor.fetchall()
-
-            self.assertEqual(data_check[0][1:],('netguru-senior-mendix-low-code-developer-warszawa', 'Senior Mendix Low-code Developer', 'Netguru', 'other', 'partly_remote', 'senior'))
-            skill_check = list(map(lambda record: record[0],data_check))
-            skill_check.sort()
-
-            self.assertEqual(skill_check,['Css','Java', 'Mendix'])
+        self.assertEqual(skill_check, ['Css', 'Java', 'Mendix'])
 
     def test_offers_locations(self):
+        self.sync_offers.call()
 
-        with patch('lib.sync_offers.requests.get') as mocked_get:
-            test_file = open('./tests/jjit_page1_test.json')
-            test_file2 = open('./tests/jjit_page2_test.json')
-            mocked_get.side_effect = [unittest.mock.Mock(**{'json.return_value': json.load(test_file), 'status_code': 200}),
-                                      unittest.mock.Mock(**{'json.return_value': json.load(test_file2), 'status_code': 200})]
-            test_file.close()
-            test_file2.close()
+        sql_select = sql.SQL("SELECT city FROM {table}").format(table=sql.Identifier('offers_locations'))
+        self.cursor.execute(sql_select)
+        data_check_select = self.cursor.fetchall()
+        data_check = list(map(lambda city: city[0], data_check_select))
+        data_check.sort()
 
-            self.sync_offers.call()
+        # check of total num of records
+        self.assertEqual(len(data_check), 19)
 
-            sql_select = sql.SQL("SELECT city FROM {table}").format(table=sql.Identifier('offers_locations'))
-            self.cursor.execute(sql_select)
-            data_check_select = self.cursor.fetchall()
-            data_check = list(map(lambda city: city[0], data_check_select))
-            data_check.sort()
+        # check of cities name list completness
+        check_list = ['Białystok', 'Bydgoszcz', 'Gdańsk', 'Katowice', 'Kielce', 'Kraków', 'Lublin', 'Olsztyn', 'Opole','Poznań', 'Rzeszów', 'Szczecin', 'Warszawa', 'Wrocław', 'Zielona Góra', 'Łódź', 'Toruń', 'Bielsko-Biała', 'Częstochowa']
+        check_list.sort()
+        self.assertEqual(data_check, check_list)
 
-            #check of total num of records
-            self.assertEqual(len(data_check),19)
+        # check of data accuracy for join offers with cities (example check for 1 offer)
+        sql_select = sql.SQL(
+            "SELECT ol.city, oi.jjit_id, oi.title, oi.company_name, oi.marker_icon, oi.workplace_type, oi.experience_level FROM offers_info oi JOIN offers_per_location_id opli ON oi.id = opli.offer_id JOIN offers_locations ol ON opli.location_id = ol.id WHERE {pkey} = 'roxart-agency-dowozacy-taski-prestashop-developer-rzeszow'").format(
+            pkey=sql.Identifier('jjit_id'))
+        self.cursor.execute(sql_select)
+        data_check = self.cursor.fetchall()
 
-            # check of cities name list completness
-            check_list = ['Białystok', 'Bydgoszcz', 'Gdańsk', 'Katowice', 'Kielce', 'Kraków', 'Lublin', 'Olsztyn', 'Opole', 'Poznań', 'Rzeszów', 'Szczecin', 'Warszawa', 'Wrocław', 'Zielona Góra', 'Łódź','Toruń','Bielsko-Biała','Częstochowa']
-            check_list.sort()
-            self.assertEqual(data_check,check_list)
+        self.assertEqual(data_check[0][1:], ('roxart-agency-dowozacy-taski-prestashop-developer-rzeszow', 'Mid/Sr Prestashop Developer', 'ROXART Agency', 'php', 'remote', 'senior'))
 
-            #check of data accuracy for join offers with cities (example check for 1 offer)
+        city_check = list(map(lambda record: record[0], data_check))
+        city_check.sort()
 
-            sql_select = sql.SQL("select ol.city, oi.jjit_id, oi.title, oi.company_name, oi.marker_icon, oi.workplace_type, oi.experience_level from offers_info oi join offers_per_location_id opli on oi.id = opli.offer_id join offers_locations ol on opli.location_id = ol.id WHERE {pkey} = 'roxart-agency-dowozacy-taski-prestashop-developer-rzeszow'").format(pkey=sql.Identifier('jjit_id'))
-            self.cursor.execute(sql_select)
-            data_check = self.cursor.fetchall()
+        self.assertEqual(city_check,['Bydgoszcz', 'Gdańsk', 'Katowice', 'Kraków', 'Lublin', 'Rzeszów', 'Szczecin', 'Warszawa', 'Wrocław', 'Łódź'])
 
-            self.assertEqual(data_check[0][1:],('roxart-agency-dowozacy-taski-prestashop-developer-rzeszow', 'Mid/Sr Prestashop Developer', 'ROXART Agency', 'php','remote', 'senior'))
+    def test_requests(self):
+        self.sync_offers.call()
+        self.mock.assert_has_calls([
+            call(
+                'https://api.justjoin.it/v2/user-panel/offers?&page=1&sortBy=published&orderBy=DESC&perPage=100&salaryCurrencies=PLN',
+                headers={'Version': '2'}),
+            call(
+                'https://api.justjoin.it/v2/user-panel/offers?&page=2&sortBy=published&orderBy=DESC&perPage=100&salaryCurrencies=PLN',
+                headers={'Version': '2'})
+        ])
 
-            city_check = list(map(lambda record: record[0],data_check))
-            city_check.sort()
-
-            self.assertEqual(city_check,['Bydgoszcz', 'Gdańsk', 'Katowice', 'Kraków', 'Lublin', 'Rzeszów', 'Szczecin', 'Warszawa', 'Wrocław', 'Łódź'])
 
 if __name__ == '__main__':
     unittest.main()

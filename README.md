@@ -48,13 +48,19 @@ Data stored in the `exchange_rates` table is overwritten each time the app is ru
 # Running app with a command line
 
 ### Run import of API data to the database:
+```
 python run_all.py
+```
 
 ### Run all tests:
+```
 python -m unittest discover ./tests   
+```
 
 ### Run single test (example):
-python -m unittest ./tests/test_db_connector.py
+```
+python -m unittest tests.test_db_connector
+```
 
 # Links
 
