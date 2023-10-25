@@ -64,7 +64,7 @@ python -m unittest tests.test_db_connector
 
 # Links
 
-* [Power BI report]()
+* [Power BI report](https://www.novypro.com/project/analysis-of-it-job-offers-published-on-just-join-it-website-power-bi)
 
 ### Project Data Sources:
 * [Just join it](https://justjoin.it)

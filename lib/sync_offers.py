@@ -47,6 +47,8 @@ class SyncOffers():
 
         while page_num:
             api_page_data = self.__fetch_api_data(page_num)
+            page_num = api_page_data['meta']['nextPage']
+            print("Page loaded" + str(page_num))
             for offer_on_page in api_page_data['data']:
                 data.append(offer_on_page)
             page_num = api_page_data['meta']['nextPage']

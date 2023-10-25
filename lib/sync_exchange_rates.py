@@ -17,6 +17,8 @@ class SyncExchangeRates:
 
         self.exchange_rates.close_cursor()
 
+        print("Exchange rates loaded")
+
     def __fetch_nbp_rates(self):
 
         api_request = requests.get('http://api.nbp.pl/api/exchangerates/tables/a/?format=json')
