@@ -1,9 +1,9 @@
 # About Project
 
-The challenge focused on analyzing a polish labour market for the IT segment based on the job offers published on Just Join IT website.
-Data presented on visualizations help user to understand the labour demand and requirements in offers published over weeks, as well as in offers that were active in the latest week.
+The challenge focused on analyzing a polish labour market for the IT segment based on the job offers published on Just Join IT website (publicly available job-offer data).
+Data collected for portfolio purposes and analyzed to help user to understand the labour demand and requirements in offers published over weeks, as well as in offers that were active in the latest week.
 
-This project is mainly directed at those who would like to enter the IT labour market, as it helps to observe which specializations are the most popular, how many job offers were targeted at juniors, what skills are must have and what are median salary ranges for a specific specialization.
+This project is mainly directed at those who would like to enter the IT labour market, as it helps to observe which specializations are the most popular, how many job offers were targeted at juniors, what skills are must have and what are median salary ranges for a specific specialization. The dashboard is not affiliated with or endorsed by Just Join IT.
 
 IT job market is analyzed in terms of:
 * Median salary ranges (estimated based on offers with salary disclosed)
@@ -61,10 +61,6 @@ python -m unittest discover ./tests
 ```
 python -m unittest tests.test_db_connector
 ```
-
-# Links
-
-* [Power BI report](https://www.novypro.com/project/analysis-of-it-job-offers-published-on-just-join-it-website-power-bi)
 
 ### Project Data Sources:
 * [Just join it](https://justjoin.it)
